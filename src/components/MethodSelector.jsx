@@ -27,7 +27,7 @@ export default function MethodSelector({ methods, active, onChange }) {
         value={active}
         onChange={(_, value) => onChange(value)}
         variant="scrollable"
-        scrollButtons={false}
+        scrollButtons="auto"
         allowScrollButtonsMobile
         TabIndicatorProps={{ sx: { height: 2, borderRadius: 999 } }}
       >
