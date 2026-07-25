@@ -1,0 +1,28 @@
+{
+  "name": "@payment-system-mp/react-widget",
+  "version": "2.0.0",
+  "description": "Componente React de checkout (Pix, cartão, boleto, saldo MP) para integração com o payment-system-mp.",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "scripts": {
+    "test:masks": "node scripts/validate-masks.mjs",
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.2.0",
+    "@mui/material": "^9.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.0"
+  }
+}
