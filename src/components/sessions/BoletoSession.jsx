@@ -19,13 +19,16 @@ export default function BoletoSession({
   payment,
   apiClient,
   onApproved,
+  onRejected,
+  onCancelled,
+  onStatusChange,
   onSubmit,
   addressStorageKey,
 }) {
   const { recentAddresses, saveAddress } = useRecentAddresses(addressStorageKey);
 
   if (payment) {
-    return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} />;
+    return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} onRejected={onRejected} onCancelled={onCancelled} onStatusChange={onStatusChange} />;
   }
 
   return (

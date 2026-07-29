@@ -7,9 +7,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
 
-export default function AccountMoneySession({ payer, onPayerChange, submitting, error, payment, apiClient, onApproved, onSubmit }) {
+export default function AccountMoneySession({ payer, onPayerChange, submitting, error, payment, apiClient, onApproved, onRejected, onCancelled, onStatusChange, onSubmit }) {
   if (payment) {
-    return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} />;
+    return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} onRejected={onRejected} onCancelled={onCancelled} onStatusChange={onStatusChange} />;
   }
 
   return (

@@ -27,7 +27,7 @@ function statusColor(status) {
   return 'warning';
 }
 
-export default function PaymentResultPanel({ payment, apiClient, onApproved, onStatusChange }) {
+export default function PaymentResultPanel({ payment, apiClient, onApproved, onRejected, onCancelled, onStatusChange }) {
   const [current, setCurrent] = useState(payment);
   const pollRef = useRef(null);
 
@@ -48,6 +48,8 @@ export default function PaymentResultPanel({ payment, apiClient, onApproved, onS
         setCurrent(data);
         onStatusChange?.(data);
         if (data.status === 'APPROVED') onApproved?.(data);
+        if (data.status === 'REJECTED' || data.status === 'CHARGED_BACK') onRejected?.(data);
+        if (data.status === 'CANCELLED') onCancelled?.(data);
         if (!POLLABLE.includes(data.status)) stopPolling();
       } catch {
         // falha pontual de rede não derruba o polling

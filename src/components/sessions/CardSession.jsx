@@ -33,6 +33,9 @@ export default function CardSession({
   payment,
   apiClient,
   onApproved,
+  onRejected,
+  onCancelled,
+  onStatusChange,
   onSubmit,
   publicKey,
   isActive,
@@ -52,7 +55,7 @@ export default function CardSession({
   const [localError, setLocalError] = useState(null);
 
   if (payment) {
-    return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} />;
+    return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} onRejected={onRejected} onCancelled={onCancelled} onStatusChange={onStatusChange} />;
   }
 
   const usingSavedCard = selectedSavedCard && selectedSavedCard !== 'new';

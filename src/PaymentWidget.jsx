@@ -10,6 +10,8 @@ import BoletoSession from './components/sessions/BoletoSession.jsx';
 import AccountMoneySession from './components/sessions/AccountMoneySession.jsx';
 import { createApiClient } from './utils/api.js';
 import { useDraft } from './hooks/useDraft.js';
+import { useCurrencyInput } from './hooks/useCurrencyInput.js';
+import AmountHeader from './components/AmountHeader.jsx';
 
 const ALL_METHODS = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'ACCOUNT_MONEY'];
 
@@ -32,9 +34,13 @@ const DEFAULT_ADDRESS = { zipCode: '', streetName: '', streetNumber: '', neighbo
  * @param {string} [props.draftKey='pw-draft']
  * @param {(payment: object) => void} [props.onPaymentCreated]
  * @param {(payment: object) => void} [props.onPaymentApproved]
+ * @param {(payment: object) => void} [props.onPaymentRejected] - status REJECTED ou CHARGED_BACK
+ * @param {(payment: object) => void} [props.onPaymentCancelled] - status CANCELLED
+ * @param {(payment: object) => void} [props.onStatusChange] - dispara em QUALQUER mudança de status (inclusive PENDING -> IN_PROCESS), inclusive na criação - use se os callbacks específicos não cobrirem seu caso
  * @param {(error: Error) => void} [props.onError]
  * @param {string} [props.accentColor]
  * @param {'dark'|'light'} [props.theme='dark']
+ * @param {boolean} [props.allowAmountEdit=false] - se true, o valor exibido no topo vira editável (com a máscara de dinheiro)
  */
 export default function PaymentWidget({
   apiBaseUrl,
@@ -51,12 +57,18 @@ export default function PaymentWidget({
   draftKey = 'pw-draft',
   onPaymentCreated,
   onPaymentApproved,
+  onPaymentRejected,
+  onPaymentCancelled,
+  onStatusChange,
   onError,
   accentColor,
   theme = 'dark',
+  allowAmountEdit = false,
 }) {
   const apiClient = useMemo(() => createApiClient(apiBaseUrl), [apiBaseUrl]);
   const muiTheme = useMemo(() => createWidgetTheme(theme, accentColor), [theme, accentColor]);
+  const currency = useCurrencyInput({ initialAmount: amount });
+  const effectiveAmount = allowAmountEdit ? currency.amount : amount;
 
   const [activeMethod, setActiveMethod] = useState(methods[0]);
   const [payer, setPayer] = useDraft(`${draftKey}:payer`, { ...DEFAULT_PAYER, ...payerOverride }, persistDraft);
@@ -74,7 +86,7 @@ export default function PaymentWidget({
       try {
         const body = {
           method: activeMethod,
-          amount,
+          amount: effectiveAmount,
           description,
           externalReference,
           payerEmail: payer.email,
@@ -87,7 +99,10 @@ export default function PaymentWidget({
         const { data } = await apiClient.createPayment(body);
         setPaymentsByMethod((prev) => ({ ...prev, [activeMethod]: data }));
         onPaymentCreated?.(data);
+        onStatusChange?.(data);
         if (data.status === 'APPROVED') onPaymentApproved?.(data);
+        if (data.status === 'REJECTED' || data.status === 'CHARGED_BACK') onPaymentRejected?.(data);
+        if (data.status === 'CANCELLED') onPaymentCancelled?.(data);
       } catch (err) {
         setError(err.message);
         onError?.(err);
@@ -95,7 +110,20 @@ export default function PaymentWidget({
         setSubmitting(false);
       }
     },
-    [activeMethod, amount, description, externalReference, payer, apiClient, onPaymentCreated, onPaymentApproved, onError],
+    [
+      activeMethod,
+      effectiveAmount,
+      description,
+      externalReference,
+      payer,
+      apiClient,
+      onPaymentCreated,
+      onPaymentApproved,
+      onPaymentRejected,
+      onPaymentCancelled,
+      onStatusChange,
+      onError,
+    ],
   );
 
   const sharedProps = {
@@ -106,6 +134,9 @@ export default function PaymentWidget({
     payment: paymentsByMethod[activeMethod] ?? null,
     apiClient,
     onApproved: onPaymentApproved,
+    onRejected: onPaymentRejected,
+    onCancelled: onPaymentCancelled,
+    onStatusChange,
     onSubmit: submitPayment,
   };
 
@@ -123,6 +154,13 @@ export default function PaymentWidget({
           bgcolor: 'background.default',
         }}
       >
+        <AmountHeader
+          display={currency.display}
+          description={description}
+          editable={allowAmountEdit}
+          inputProps={currency.inputProps}
+        />
+
         <MethodSelector methods={methods} active={activeMethod} onChange={setActiveMethod} />
 
         {activeMethod === 'PIX' && <PixSession {...sharedProps} />}
