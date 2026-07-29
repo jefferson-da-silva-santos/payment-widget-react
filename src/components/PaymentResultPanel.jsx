@@ -103,6 +103,12 @@ export default function PaymentResultPanel({ payment, apiClient, onApproved, onR
           Abrir boleto
         </Button>
       )}
+
+      {current.status === 'APPROVED' && (
+        <Button variant="outlined" href={apiClient.getReceiptUrl(current.id)} target="_blank" rel="noreferrer">
+          Baixar comprovante
+        </Button>
+      )}
     </Stack>
   );
 }

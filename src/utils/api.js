@@ -12,9 +12,11 @@
 //   GET  {apiBaseUrl}/payments/:id        -> consulta (?syncWithMp=true opcional)
 //   POST {apiBaseUrl}/payments/:id/refund
 //   POST {apiBaseUrl}/payments/:id/cancel
+//   GET  {apiBaseUrl}/payments/:id/receipt -> PDF do comprovante (só para APROVADOS)
 //
-// Todas as respostas devem seguir o mesmo envelope do payment-system-mp:
+// Todas as respostas JSON devem seguir o mesmo envelope do payment-system-mp:
 //   { success, message, data, meta, timestamp }
+// A rota de comprovante é a única exceção - devolve o PDF binário direto.
 // ==========================================================
 
 async function request(apiBaseUrl, path, options = {}) {
@@ -49,5 +51,10 @@ export function createApiClient(apiBaseUrl) {
     refundPayment: (id, amount) =>
       request(apiBaseUrl, `/payments/${id}/refund`, { method: 'POST', body: amount ? { amount } : {} }),
     cancelPayment: (id) => request(apiBaseUrl, `/payments/${id}/cancel`, { method: 'POST' }),
+    // Não usa o helper `request` de propósito - o navegador abre/baixa
+    // esse PDF direto (nova aba ou download), sem precisar de fetch +
+    // parse de JSON. Navegação de <a href> não é bloqueada por CORS
+    // (diferente de fetch/XHR lendo o corpo da resposta).
+    getReceiptUrl: (id) => `${apiBaseUrl}/payments/${id}/receipt`,
   };
 }

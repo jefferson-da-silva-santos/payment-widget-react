@@ -42,6 +42,7 @@ POST {apiBaseUrl}/payments            -> cria pagamento
 GET  {apiBaseUrl}/payments/:id        -> consulta (?syncWithMp=true opcional)
 POST {apiBaseUrl}/payments/:id/refund
 POST {apiBaseUrl}/payments/:id/cancel
+GET  {apiBaseUrl}/payments/:id/receipt -> PDF do comprovante (só para pagamentos APROVADOS - resposta binária, não JSON)
 ```
 
 Todas as respostas devem seguir o mesmo envelope do `payment-system-mp`
@@ -136,4 +137,4 @@ import { maskDocument, isValidCpf } from '@payment-system-mp/react-widget';
 import { maskCardNumber, detectCardBrand } from '@payment-system-mp/react-widget';
 ```
 
-Validadas em `scripts/validate-masks.mjs` (`npm run test:masks`).# payment-widget-react
+Validadas em `scripts/validate-masks.mjs` (`npm run test:masks`).
