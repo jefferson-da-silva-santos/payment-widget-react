@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
+import PixAnimation from '../animations/PixAnimation.jsx';
 
 export default function PixSession({ payer, onPayerChange, submitting, error, payment, apiClient, onApproved, onRejected, onCancelled, onStatusChange, onSubmit }) {
   if (payment) {
@@ -26,6 +27,8 @@ export default function PixSession({ payer, onPayerChange, submitting, error, pa
         <Typography variant="subtitle1" fontWeight={650}>Pagar com Pix</Typography>
         <Typography variant="caption" color="text.secondary">Aprovação em segundos após o pagamento.</Typography>
       </Stack>
+
+      <PixAnimation active={submitting} />
 
       <PayerFields payer={payer} onChange={onPayerChange} />
 

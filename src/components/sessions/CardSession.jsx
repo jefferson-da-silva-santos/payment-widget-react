@@ -17,6 +17,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
 import SavedCardsPicker from '../SavedCardsPicker.jsx';
+import CardPreview from '../animations/CardPreview.jsx';
 import { useMercadoPagoSdk } from '../../hooks/useMercadoPagoSdk.js';
 import { maskCardNumber, maskExpiry, maskCvv, parseExpiry, detectCardBrand } from '../../masks/card.js';
 import { documentType, onlyDigits } from '../../masks/document.js';
@@ -53,6 +54,7 @@ export default function CardSession({
   const [installments, setInstallments] = useState(1);
   const [saveCard, setSaveCard] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [focusedField, setFocusedField] = useState(null);
 
   if (payment) {
     return <PaymentResultPanel payment={payment} apiClient={apiClient} onApproved={onApproved} onRejected={onRejected} onCancelled={onCancelled} onStatusChange={onStatusChange} />;
@@ -108,6 +110,17 @@ export default function CardSession({
         )}
       </Stack>
 
+      {!usingSavedCard && (
+        <CardPreview
+          cardNumber={cardNumber}
+          cardholderName={cardholderName}
+          expiry={expiry}
+          cvv={cvv}
+          brand={brand}
+          flipped={focusedField === 'cvv'}
+        />
+      )}
+
       <SavedCardsPicker savedCards={savedCards} selected={selectedSavedCard} onSelect={setSelectedSavedCard} />
 
       {!usingSavedCard && (
@@ -142,6 +155,8 @@ export default function CardSession({
               label="CVV"
               value={cvv}
               onChange={(e) => setCvv(maskCvv(e.target.value, cardNumber))}
+              onFocus={() => setFocusedField('cvv')}
+              onBlur={() => setFocusedField(null)}
               placeholder={brand.cvvLength === 4 ? '0000' : '000'}
               inputMode="numeric"
             />

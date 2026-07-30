@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
+import WalletAnimation from '../animations/WalletAnimation.jsx';
 
 export default function AccountMoneySession({ payer, onPayerChange, submitting, error, payment, apiClient, onApproved, onRejected, onCancelled, onStatusChange, onSubmit }) {
   if (payment) {
@@ -26,6 +27,8 @@ export default function AccountMoneySession({ payer, onPayerChange, submitting, 
         <Typography variant="subtitle1" fontWeight={650}>Pagar com saldo Mercado Pago</Typography>
         <Typography variant="caption" color="text.secondary">O pagador precisa ter saldo disponível na conta.</Typography>
       </Stack>
+
+      <WalletAnimation active={submitting} />
 
       <PayerFields payer={payer} onChange={onPayerChange} />
 

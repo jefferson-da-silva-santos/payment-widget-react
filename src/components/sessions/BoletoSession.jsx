@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import AddressFields from '../AddressFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
+import BoletoAnimation from '../animations/BoletoAnimation.jsx';
 import { useRecentAddresses } from '../../hooks/useRecentAddresses.js';
 
 export default function BoletoSession({
@@ -46,6 +47,8 @@ export default function BoletoSession({
         <Typography variant="subtitle1" fontWeight={650}>Pagar com boleto</Typography>
         <Typography variant="caption" color="text.secondary">Compensação em até 2 dias úteis após o pagamento.</Typography>
       </Stack>
+
+      <BoletoAnimation active={submitting} />
 
       <PayerFields payer={payer} onChange={onPayerChange} />
       <AddressFields address={address} onChange={onAddressChange} recentAddresses={recentAddresses} />
