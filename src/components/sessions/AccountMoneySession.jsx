@@ -6,7 +6,6 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
-import SessionTabs from '../SessionTabs.jsx';
 import WalletAnimation from '../animations/WalletAnimation.jsx';
 
 export default function AccountMoneySession({ payer, onPayerChange, submitting, error, payment, apiClient, onApproved, onRejected, onCancelled, onStatusChange, onSubmit }) {
@@ -29,11 +28,9 @@ export default function AccountMoneySession({ payer, onPayerChange, submitting, 
         <Typography variant="caption" color="text.secondary">O pagador precisa ter saldo disponível na conta.</Typography>
       </Stack>
 
-      <SessionTabs
-        paymentLabel="Saldo"
-        paymentPane={<WalletAnimation active={submitting} />}
-        dataPane={<PayerFields payer={payer} onChange={onPayerChange} />}
-      />
+      <WalletAnimation active={submitting} />
+
+      <PayerFields payer={payer} onChange={onPayerChange} />
 
       {error && <Alert severity="error">{error}</Alert>}
 
