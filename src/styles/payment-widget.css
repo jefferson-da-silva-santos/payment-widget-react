@@ -21,12 +21,12 @@
 .pw-root .pw-mono { font-family: var(--pw-mono); }
 
 /* ==================== Cabeçalho de valor ==================== */
-.pw-amount-header { padding: var(--pw-space) var(--pw-space) 10px; }
-.pw-amount-label { display: block; text-transform: uppercase; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; opacity: 0.75; }
-.pw-amount-value { display: block; margin: 4px 0 0; font-size: 30px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; border: none; padding: 0; width: 100%; background: transparent; color: inherit; }
-.pw-amount-desc { display: block; margin-top: 6px; }
+.pw-amount-header { padding: var(--pw-space) var(--pw-space) 14px; }
+.pw-amount-label { display: block; text-transform: uppercase; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; opacity: 0.75; }
+.pw-amount-value { display: block; margin: 6px 0 0; font-size: 48px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; border: none; padding: 0; width: 100%; color: var(--pw-accent, #6d5ef8); background: linear-gradient(120deg, color-mix(in srgb, var(--pw-accent, #6d5ef8) 55%, white 45%), var(--pw-accent, #6d5ef8) 60%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 14px color-mix(in srgb, var(--pw-accent, #6d5ef8) 40%, transparent)); }
+.pw-amount-desc { display: block; margin-top: 8px; }
 @media (min-width: 640px) {
-  .pw-amount-value { font-size: 34px; }
+  .pw-amount-value { font-size: 56px; }
 }
 
 /* ==================== Cartão ==================== */
@@ -108,39 +108,71 @@
   .pw-anim-stage { height: 148px; border-radius: 18px; }
 }
 
-/* ==================== Pix: marca se montando ==================== */
-.pw-pix-mark { position: relative; width: 84px; height: 84px; filter: drop-shadow(0 10px 20px rgba(20, 180, 150, 0.35)); }
+/* ==================== Pix: marca se montando (3 fatias empilhadas) ==================== */
+.pw-pix-mark { position: relative; width: 96px; height: 96px; }
 @media (min-width: 640px) {
-  .pw-pix-mark { width: 96px; height: 96px; }
+  .pw-pix-mark { width: 112px; height: 112px; }
 }
 
-.pw-pix-piece path { stroke: rgba(6, 16, 14, 0.35); stroke-width: 1.2; paint-order: stroke; }
+/* ==================== Pix: marca oficial se montando pela própria divisão do SVG ==================== */
+.pw-pix-mark { position: relative; width: 84px; height: 84px; }
+@media (min-width: 640px) {
+  .pw-pix-mark { width: 100px; height: 100px; }
+}
 
-.pw-pix-piece--middle { transform-origin: 50px 50px; animation: pw-pix-breathe var(--pw-pix-duration, 3.4s) ease-in-out infinite; }
-.pw-pix-piece--top { transform-origin: 50px 50px; animation: pw-pix-fall-top var(--pw-pix-duration, 3.4s) cubic-bezier(0.5, 0, 0.22, 1) infinite; }
-.pw-pix-piece--bottom { transform-origin: 50px 50px; animation: pw-pix-fall-bottom var(--pw-pix-duration, 3.4s) cubic-bezier(0.5, 0, 0.22, 1) infinite; }
+.pw-pix-logo { width: 100%; height: 100%; filter: drop-shadow(0 10px 18px rgba(14, 124, 110, 0.45)); overflow: visible; }
+
+.pw-pix-core { animation: pw-pix-core-glow var(--pw-pix-duration, 3.2s) ease-in-out infinite; }
+.pw-pix-tip { transform-box: fill-box; transform-origin: center; }
+.pw-pix-tip--br { animation: pw-pix-tip-br var(--pw-pix-duration, 3.2s) cubic-bezier(0.5, 0, 0.22, 1) infinite; }
+.pw-pix-tip--tl { animation: pw-pix-tip-tl var(--pw-pix-duration, 3.2s) cubic-bezier(0.5, 0, 0.22, 1) infinite; }
+
+@keyframes pw-pix-tip-br {
+  0% { transform: translate(9px, 9px); opacity: 0; }
+  20% { opacity: 1; }
+  38%, 72% { transform: translate(0, 0); opacity: 1; }
+  92%, 100% { transform: translate(9px, 9px); opacity: 0; }
+}
+@keyframes pw-pix-tip-tl {
+  0% { transform: translate(-9px, -9px); opacity: 0; }
+  20% { opacity: 1; }
+  38%, 72% { transform: translate(0, 0); opacity: 1; }
+  92%, 100% { transform: translate(-9px, -9px); opacity: 0; }
+}
+@keyframes pw-pix-core-glow {
+  0%, 34% { filter: brightness(0.92); }
+  50%, 60% { filter: brightness(1.15); }
+  76%, 100% { filter: brightness(0.92); }
+}
+
+.pw-pix-slice--top { animation: pw-pix-fall-top var(--pw-pix-duration, 3.2s) cubic-bezier(0.5, 0, 0.22, 1) infinite; }
+.pw-pix-slice--bottom { animation: pw-pix-fall-bottom var(--pw-pix-duration, 3.2s) cubic-bezier(0.5, 0, 0.22, 1) infinite; }
+.pw-pix-slice--mid { animation: pw-pix-glow var(--pw-pix-duration, 3.2s) ease-in-out infinite; }
 
 @keyframes pw-pix-fall-top {
-  0% { transform: translateY(-52px) scale(0.7); opacity: 0; }
-  20% { opacity: 1; }
-  38%, 72% { transform: translateY(0) scale(1); opacity: 1; }
-  92%, 100% { transform: translateY(-52px) scale(0.7); opacity: 0; }
+  0% { transform: translateY(-64px); opacity: 0; }
+  18% { opacity: 1; }
+  38%, 72% { transform: translateY(0); opacity: 1; }
+  92%, 100% { transform: translateY(-64px); opacity: 0; }
 }
 @keyframes pw-pix-fall-bottom {
-  0% { transform: translateY(52px) scale(0.7); opacity: 0; }
-  20% { opacity: 1; }
-  38%, 72% { transform: translateY(0) scale(1); opacity: 1; }
-  92%, 100% { transform: translateY(52px) scale(0.7); opacity: 0; }
+  0% { transform: translateY(64px); opacity: 0; }
+  18% { opacity: 1; }
+  38%, 72% { transform: translateY(0); opacity: 1; }
+  92%, 100% { transform: translateY(64px); opacity: 0; }
 }
-@keyframes pw-pix-breathe {
+@keyframes pw-pix-glow {
   0%, 34% { filter: brightness(0.94); }
-  50%, 60% { filter: brightness(1.14); }
+  50%, 60% { filter: brightness(1.16); }
   76%, 100% { filter: brightness(0.94); }
 }
 
 /* ==================== Boleto: leitor de código de barras ==================== */
-.pw-barcode { position: relative; display: flex; align-items: stretch; gap: 2px; height: 58px; width: 100%; max-width: 240px; }
-.pw-barcode-bar { background: linear-gradient(180deg, #262b38, #14161c); border-radius: 1px; transform-origin: center; animation: pw-bar-grow 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.pw-barcode { position: relative; display: inline-flex; align-items: stretch; gap: 3px; height: 92px; width: auto; max-width: 100%; }
+.pw-barcode-bar { background: linear-gradient(180deg, color-mix(in srgb, currentColor 92%, transparent), color-mix(in srgb, currentColor 65%, transparent)); border-radius: 1px; transform-origin: center; animation: pw-bar-grow 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@media (min-width: 640px) {
+  .pw-barcode { height: 104px; }
+}
 @keyframes pw-bar-grow { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
 .pw-scan-line { position: absolute; top: -8px; bottom: -8px; width: 3px; border-radius: 2px; background: var(--pw-accent, #6d5ef8); box-shadow: 0 0 14px 2px color-mix(in srgb, var(--pw-accent, #6d5ef8) 80%, transparent); animation: pw-scan var(--pw-scan-duration, 2.4s) ease-in-out infinite; }
 @keyframes pw-scan { 0%, 100% { left: 0%; opacity: 0; } 8% { opacity: 1; } 50% { left: 100%; opacity: 1; } 58% { opacity: 0; } }

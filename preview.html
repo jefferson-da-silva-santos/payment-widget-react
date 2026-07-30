@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Payment Widget — Preview</title>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18",
+    "react-dom": "https://esm.sh/react-dom@18",
+    "react-dom/client": "https://esm.sh/react-dom@18/client",
+    "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime",
+    "react/jsx-dev-runtime": "https://esm.sh/react@18/jsx-dev-runtime",
+    "@mui/material": "https://esm.sh/@mui/material@5?deps=react@18,react-dom@18",
+    "@mui/material/": "https://esm.sh/@mui/material@5&deps=react@18,react-dom@18/",
+    "@mui/icons-material/": "https://esm.sh/@mui/icons-material@5&deps=react@18,react-dom@18/"
+  }
+}
+</script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  html, body { margin: 0; background: #05060a; min-height: 100vh; }
+  #root { display: flex; justify-content: center; align-items: flex-start; padding: 48px 20px; gap: 40px; flex-wrap: wrap; }
+  .pw-demo-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .pw-demo-label { color: #8890a4; font: 600 12px/1 -apple-system, sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+  .pw-demo-frame--mobile { width: 390px; }
+  .pw-demo-frame--desktop { width: 480px; }
+  #boot-error { color: #f2545b; font-family: monospace; white-space: pre-wrap; padding: 24px; }
+</style>
+</head>
+<body>
+<div id="root"><div id="boot-error"></div></div>
+<script type="module">
+const errEl = document.getElementById('boot-error');
+function log(msg) { errEl.textContent += msg + '\n'; }
+window.addEventListener('error', (e) => log('window error: ' + (e.message || e.error)));
+window.addEventListener('unhandledrejection', (e) => log('unhandled rejection: ' + (e.reason && e.reason.stack || e.reason)));
+
+const cache = new Map();
+const cssInjected = new Set();
+
+function resolve(fromKey, spec) {
+  const parts = fromKey.split('/').slice(0, -1);
+  for (const part of spec.split('/')) {
+    if (part === '.' || part === '') continue;
+    if (part === '..') parts.pop();
+    else parts.push(part);
+  }
+  return parts.join('/');
+}
+
+async function loadModule(key) {
+  if (cache.has(key)) return cache.get(key);
+  log('loading ' + key);
+  const promise = (async () => {
+    const res = await fetch('./' + key);
+    if (!res.ok) throw new Error('fetch failed (' + res.status + '): ' + key);
+    let code = await res.text();
+
+    // CSS: injecta <link> real e remove a linha de import
+    code = code.replace(/^\s*import\s+['"]([^'"]+\.css)['"];?\s*$/gm, (line, cssSpec) => {
+      const cssKey = resolve(key, cssSpec);
+      if (!cssInjected.has(cssKey)) {
+        cssInjected.add(cssKey);
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = './' + cssKey;
+        document.head.appendChild(link);
+      }
+      return '';
+    });
+
+    // Resolve imports/exports relativos (./ ou ../) para blob URLs
+    const specifiers = new Set();
+    const re = /from\s+['"](\.[^'"]+)['"]/g;
+    let m;
+    while ((m = re.exec(code))) specifiers.add(m[1]);
+
+    for (const spec of specifiers) {
+      const depKey = resolve(key, spec);
+      const blobUrl = await loadModule(depKey);
+      code = code.split(`'${spec}'`).join(`'${blobUrl}'`).split(`"${spec}"`).join(`"${blobUrl}"`);
+    }
+
+    if (key.endsWith('.jsx')) {
+      code = Babel.transform(code, { presets: [['react', { runtime: 'automatic' }]] }).code;
+    }
+
+    const blob = new Blob([code], { type: 'text/javascript' });
+    return URL.createObjectURL(blob);
+  })();
+  cache.set(key, promise);
+  return promise;
+}
+
+try {
+  log('boot start');
+  const React = await import('react');
+  log('react ok');
+  const { createRoot } = await import('react-dom/client');
+  log('react-dom ok');
+  const entryUrl = await loadModule('src/index.js');
+  log('entry module built, importing…');
+  const { PaymentWidget } = await import(entryUrl);
+  log('PaymentWidget imported ok');
+
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  function Demo({ label, frameClass }) {
+    return React.createElement(
+      'div',
+      { className: 'pw-demo-col' },
+      React.createElement('span', { className: 'pw-demo-label' }, label),
+      React.createElement(
+        'div',
+        { className: frameClass },
+        React.createElement(PaymentWidget, {
+          apiBaseUrl: 'http://localhost:4000/api',
+          publicKey: 'TEST-fake-public-key',
+          amount: 150,
+          description: 'Pedido de teste #4821',
+          methods: ['PIX', 'CREDIT_CARD', 'BOLETO', 'ACCOUNT_MONEY'],
+        })
+      )
+    );
+  }
+
+  createRoot(root).render(
+    React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(Demo, { label: 'Mobile (390px)', frameClass: 'pw-demo-frame--mobile' }),
+      React.createElement(Demo, { label: 'Desktop (480px)', frameClass: 'pw-demo-frame--desktop' })
+    )
+  );
+} catch (err) {
+  log('ERRO: ' + (err && (err.stack || err.message) || err));
+  console.error(err);
+}
+</script>
+</body>
+</html>

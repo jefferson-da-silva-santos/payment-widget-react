@@ -15,7 +15,7 @@ export default function BoletoAnimation({ active }) {
           <Box
             key={i}
             className="pw-barcode-bar"
-            sx={{ width: w * 2 }}
+            sx={{ width: w * 4 }}
             style={{ animationDelay: `${i * 0.025}s` }}
           />
         ))}
