@@ -17,6 +17,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
 import SavedCardsPicker from '../SavedCardsPicker.jsx';
+import SessionTabs from '../SessionTabs.jsx';
 import CardPreview from '../animations/CardPreview.jsx';
 import { useMercadoPagoSdk } from '../../hooks/useMercadoPagoSdk.js';
 import { maskCardNumber, maskExpiry, maskCvv, parseExpiry, detectCardBrand } from '../../masks/card.js';
@@ -110,82 +111,88 @@ export default function CardSession({
         )}
       </Stack>
 
-      {!usingSavedCard && (
-        <CardPreview
-          cardNumber={cardNumber}
-          cardholderName={cardholderName}
-          expiry={expiry}
-          cvv={cvv}
-          brand={brand}
-          flipped={focusedField === 'cvv'}
-        />
-      )}
+      <SessionTabs
+        paymentLabel="Cartão"
+        paymentPane={
+          <>
+            {!usingSavedCard && (
+              <CardPreview
+                cardNumber={cardNumber}
+                cardholderName={cardholderName}
+                expiry={expiry}
+                cvv={cvv}
+                brand={brand}
+                flipped={focusedField === 'cvv'}
+              />
+            )}
 
-      <SavedCardsPicker savedCards={savedCards} selected={selectedSavedCard} onSelect={setSelectedSavedCard} />
+            <SavedCardsPicker savedCards={savedCards} selected={selectedSavedCard} onSelect={setSelectedSavedCard} />
 
-      {!usingSavedCard && (
-        <>
-          <TextField
-            label="Número do cartão"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(maskCardNumber(e.target.value))}
-            placeholder="0000 0000 0000 0000"
-            inputMode="numeric"
-            InputProps={{
-              endAdornment: brand.id !== 'unknown' && (
-                <InputAdornment position="end">
-                  <Typography variant="caption" fontWeight={700} textTransform="uppercase" color="text.secondary">
-                    {BRAND_LABEL[brand.id]}
-                  </Typography>
-                </InputAdornment>
-              ),
-            }}
-          />
+            {!usingSavedCard && (
+              <>
+                <TextField
+                  label="Número do cartão"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(maskCardNumber(e.target.value))}
+                  placeholder="0000 0000 0000 0000"
+                  inputMode="numeric"
+                  InputProps={{
+                    endAdornment: brand.id !== 'unknown' && (
+                      <InputAdornment position="end">
+                        <Typography variant="caption" fontWeight={700} textTransform="uppercase" color="text.secondary">
+                          {BRAND_LABEL[brand.id]}
+                        </Typography>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-          <TextField
-            label="Nome impresso no cartão"
-            value={cardholderName}
-            onChange={(e) => setCardholderName(e.target.value.toUpperCase())}
-            placeholder="COMO ESTÁ NO CARTÃO"
-          />
+                <TextField
+                  label="Nome impresso no cartão"
+                  value={cardholderName}
+                  onChange={(e) => setCardholderName(e.target.value.toUpperCase())}
+                  placeholder="COMO ESTÁ NO CARTÃO"
+                />
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
-            <TextField label="Validade" value={expiry} onChange={(e) => setExpiry(maskExpiry(e.target.value))} placeholder="MM/AA" inputMode="numeric" />
-            <TextField
-              label="CVV"
-              value={cvv}
-              onChange={(e) => setCvv(maskCvv(e.target.value, cardNumber))}
-              onFocus={() => setFocusedField('cvv')}
-              onBlur={() => setFocusedField(null)}
-              placeholder={brand.cvvLength === 4 ? '0000' : '000'}
-              inputMode="numeric"
-            />
-          </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                  <TextField label="Validade" value={expiry} onChange={(e) => setExpiry(maskExpiry(e.target.value))} placeholder="MM/AA" inputMode="numeric" />
+                  <TextField
+                    label="CVV"
+                    value={cvv}
+                    onChange={(e) => setCvv(maskCvv(e.target.value, cardNumber))}
+                    onFocus={() => setFocusedField('cvv')}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder={brand.cvvLength === 4 ? '0000' : '000'}
+                    inputMode="numeric"
+                  />
+                </Box>
 
-          {allowSaveCard && (
-            <FormControlLabel
-              control={<Checkbox size="small" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} />}
-              label={<Typography variant="body2">Salvar este cartão para próximas compras</Typography>}
-            />
-          )}
-        </>
-      )}
+                {allowSaveCard && (
+                  <FormControlLabel
+                    control={<Checkbox size="small" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} />}
+                    label={<Typography variant="body2">Salvar este cartão para próximas compras</Typography>}
+                  />
+                )}
+              </>
+            )}
 
-      <FormControl fullWidth size="small">
-        <InputLabel id="pw-installments-label">Parcelas</InputLabel>
-        <Select
-          labelId="pw-installments-label"
-          label="Parcelas"
-          value={installments}
-          onChange={(e) => setInstallments(Number(e.target.value))}
-        >
-          {INSTALLMENT_OPTIONS.map((n) => (
-            <MenuItem key={n} value={n}>{n}x</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <PayerFields payer={payer} onChange={onPayerChange} />
+            <FormControl fullWidth size="small">
+              <InputLabel id="pw-installments-label">Parcelas</InputLabel>
+              <Select
+                labelId="pw-installments-label"
+                label="Parcelas"
+                value={installments}
+                onChange={(e) => setInstallments(Number(e.target.value))}
+              >
+                {INSTALLMENT_OPTIONS.map((n) => (
+                  <MenuItem key={n} value={n}>{n}x</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </>
+        }
+        dataPane={<PayerFields payer={payer} onChange={onPayerChange} />}
+      />
 
       {(error || localError) && <Alert severity="error">{error || localError}</Alert>}
 

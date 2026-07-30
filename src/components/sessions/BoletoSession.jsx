@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import AddressFields from '../AddressFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
+import SessionTabs from '../SessionTabs.jsx';
 import BoletoAnimation from '../animations/BoletoAnimation.jsx';
 import { useRecentAddresses } from '../../hooks/useRecentAddresses.js';
 
@@ -48,10 +49,16 @@ export default function BoletoSession({
         <Typography variant="caption" color="text.secondary">Compensação em até 2 dias úteis após o pagamento.</Typography>
       </Stack>
 
-      <BoletoAnimation active={submitting} />
-
-      <PayerFields payer={payer} onChange={onPayerChange} />
-      <AddressFields address={address} onChange={onAddressChange} recentAddresses={recentAddresses} />
+      <SessionTabs
+        paymentLabel="Boleto"
+        paymentPane={<BoletoAnimation active={submitting} />}
+        dataPane={
+          <>
+            <PayerFields payer={payer} onChange={onPayerChange} />
+            <AddressFields address={address} onChange={onAddressChange} recentAddresses={recentAddresses} />
+          </>
+        }
+      />
 
       {error && <Alert severity="error">{error}</Alert>}
 

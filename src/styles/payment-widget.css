@@ -1,11 +1,11 @@
 /* ARQUIVO: src/styles/payment-widget.css
    Folha única com tokens visuais + animações do widget. Escopada sob
    .pw-root para nunca vazar para o app hospedeiro. */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 .pw-root {
-  --pw-font-display: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --pw-font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pw-font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pw-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --pw-mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-family: var(--pw-font-body);
 }
@@ -75,17 +75,17 @@
 .pw-card-cvv-strip { background: repeating-linear-gradient(45deg, #eceef2, #eceef2 4px, #dcdee5 4px, #dcdee5 8px); border-radius: 3px; height: 30px; flex: 1; }
 .pw-card-cvv-box { background: #f4f2e8; color: #14161c; font-family: var(--pw-mono); font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 3px; min-width: 40px; text-align: center; }
 
-/* ---------- Pix: radar de sinal ---------- */
+/* ---------- Pix: logo se montando ---------- */
 .pw-anim-stage { position: relative; height: 116px; border-radius: 14px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(120% 140% at 50% 0%, rgba(255, 255, 255, 0.05), transparent 60%); }
 
-.pw-pix-ring { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--pw-accent, #6d5ef8); animation: pw-pix-ping var(--pw-pix-duration, 2.2s) cubic-bezier(0.2, 0.7, 0.3, 1) infinite; }
-@keyframes pw-pix-ping {
-  0% { transform: scale(0.35); opacity: 0.75; }
-  70% { opacity: 0.18; }
-  100% { transform: scale(2.8); opacity: 0; }
+.pw-pix-flower { position: relative; width: 76px; height: 76px; }
+.pw-pix-petal { position: absolute; top: 50%; left: 50%; width: 34px; height: 52px; margin: -26px 0 0 -17px; transform-origin: 50% 50%; }
+.pw-pix-petal-inner { width: 100%; height: 100%; color: var(--pw-accent, #32b8a6); animation: pw-petal-assemble var(--pw-pix-duration, 3.2s) cubic-bezier(0.45, 0, 0.2, 1) infinite; filter: drop-shadow(0 4px 10px color-mix(in srgb, var(--pw-accent, #32b8a6) 45%, transparent)); }
+@keyframes pw-petal-assemble {
+  0% { transform: translateY(-40px) scale(0.45) rotate(-30deg); opacity: 0; }
+  38%, 68% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-40px) scale(0.45) rotate(30deg); opacity: 0; }
 }
-.pw-pix-core { position: relative; z-index: 1; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(150deg, var(--pw-accent, #6d5ef8), color-mix(in srgb, var(--pw-accent, #6d5ef8) 70%, #000)); box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--pw-accent, #6d5ef8) 60%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.3); animation: pw-pix-breathe var(--pw-pix-duration, 2.2s) ease-in-out infinite; }
-@keyframes pw-pix-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
 
 /* ---------- Boleto: leitor de código de barras ---------- */
 .pw-barcode { position: relative; display: flex; align-items: stretch; gap: 2px; height: 54px; width: 100%; max-width: 240px; }
@@ -113,3 +113,7 @@
 .pw-root .MuiOutlinedInput-root.Mui-focused { box-shadow: 0 0 0 3px color-mix(in srgb, var(--pw-accent, #6d5ef8) 22%, transparent); }
 .pw-root .MuiButton-containedPrimary { box-shadow: 0 10px 22px -6px color-mix(in srgb, var(--pw-accent, #6d5ef8) 55%, transparent); }
 .pw-root .MuiButton-containedPrimary:active { transform: scale(0.98); }
+
+/* ---------- Sub-abas (desktop): pagamento vs. dados ---------- */
+.pw-subtabs .MuiTab-root { min-height: 40px; font-size: 12.5px; font-weight: 650; }
+.pw-subtabs .MuiTabs-indicator { height: 2px; border-radius: 999px; }
