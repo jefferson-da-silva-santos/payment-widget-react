@@ -44,7 +44,7 @@ export default function BoletoSession({
       }}
     >
       <Stack spacing={0.25}>
-        <Typography variant="subtitle1" fontWeight={650}>Pagar com boleto</Typography>
+        <Typography variant="subtitle1" fontWeight={700} className="pw-display">Pagar com boleto</Typography>
         <Typography variant="caption" color="text.secondary">Compensação em até 2 dias úteis após o pagamento.</Typography>
       </Stack>
 

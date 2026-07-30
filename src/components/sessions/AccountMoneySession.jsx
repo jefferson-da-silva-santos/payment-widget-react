@@ -24,7 +24,7 @@ export default function AccountMoneySession({ payer, onPayerChange, submitting, 
       }}
     >
       <Stack spacing={0.25}>
-        <Typography variant="subtitle1" fontWeight={650}>Pagar com saldo Mercado Pago</Typography>
+        <Typography variant="subtitle1" fontWeight={700} className="pw-display">Pagar com saldo Mercado Pago</Typography>
         <Typography variant="caption" color="text.secondary">O pagador precisa ter saldo disponível na conta.</Typography>
       </Stack>
 

@@ -33,7 +33,9 @@ export function createWidgetTheme(mode = 'dark', accentColor) {
     },
     shape: { borderRadius: RADIUS },
     typography: {
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      fontFamily: '"Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      h5: { fontFamily: '"Sora", "Manrope", sans-serif' },
+      subtitle1: { fontFamily: '"Sora", "Manrope", sans-serif', letterSpacing: '-0.01em' },
       button: { textTransform: 'none', fontWeight: 650 },
     },
     components: {

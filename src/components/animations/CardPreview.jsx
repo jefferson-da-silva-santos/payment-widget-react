@@ -1,6 +1,6 @@
 // ARQUIVO: src/components/animations/CardPreview.jsx
-// Pré-visualização animada do cartão: espelha o que o pagador digita
-// em tempo real e vira em 3D pra mostrar o CVV quando o campo está focado.
+// Cartão SVG realista: relevo metálico, chip com glint periódico,
+// sheen contínuo, verso com tarja + CVV. Usa classes de payment-widget.css.
 import Box from '@mui/material/Box';
 
 const BRAND_TEXT = { visa: 'VISA', mastercard: 'MASTERCARD', amex: 'AMEX', elo: 'ELO', hipercard: 'HIPERCARD', diners: 'DINERS' };
@@ -29,98 +29,42 @@ export default function CardPreview({ cardNumber, cardholderName, expiry, cvv, b
   const brandText = brand && brand.id !== 'unknown' ? BRAND_TEXT[brand.id] ?? brand.id.toUpperCase() : 'CARTÃO';
 
   return (
-    <Box sx={{ perspective: 1200, mb: 0.5 }}>
-      <Box
-        sx={{
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '1.586',
-          transformStyle: 'preserve-3d',
-          transition: 'transform 0.6s cubic-bezier(.4,.2,.2,1)',
-          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        }}
-      >
-        {/* frente */}
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: 3,
-            backfaceVisibility: 'hidden',
-            background: 'linear-gradient(160deg,#3a3f4c 0%,#262a34 45%,#14161c 100%)',
-            boxShadow: '0 14px 32px rgba(20,20,30,0.32), inset 0 0 0 1px rgba(255,255,255,0.06)',
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            overflow: 'hidden',
-            color: '#fff',
-            '@keyframes pwCardShine': {
-              '0%': { transform: 'translateX(-120%) rotate(8deg)' },
-              '100%': { transform: 'translateX(220%) rotate(8deg)' },
-            },
-          }}
-        >
-          <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 85% 8%, rgba(255,255,255,0.10), transparent 45%)' }} />
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: '-40%',
-              width: '55%',
-              height: '100%',
-              background: 'linear-gradient(75deg, transparent, rgba(255,255,255,0.10), transparent)',
-              animation: 'pwCardShine 6s ease-in-out infinite',
-            }}
-          />
+    <Box className="pw-card-scene" sx={{ mb: 0.5 }}>
+      <Box className={`pw-card${flipped ? ' is-flipped' : ''}`}>
+        <Box className="pw-card-face pw-card-face--front">
+          <Box className="pw-card-sheen" />
 
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', zIndex: 1 }}>
-            <svg width="38" height="28" viewBox="0 0 40 30">
+          <Box className="pw-card-row">
+            <svg width="38" height="28" viewBox="0 0 40 30" className="pw-chip-shine">
               <defs>
                 <linearGradient id="pwChipGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#f4e6a8" />
-                  <stop offset="0.5" stopColor="#d8b400" />
-                  <stop offset="1" stopColor="#8a6f00" />
+                  <stop offset="0" stopColor="#f6ecc0" />
+                  <stop offset="0.5" stopColor="#cfa93a" />
+                  <stop offset="1" stopColor="#7a5e14" />
                 </linearGradient>
               </defs>
               <rect x="0.5" y="0.5" width="39" height="29" rx="5" fill="url(#pwChipGrad)" />
-              <rect x="6" y="6" width="28" height="18" rx="3" fill="none" stroke="#5b4a00" strokeWidth="0.8" opacity="0.55" />
-              <line x1="0.5" y1="10" x2="14" y2="10" stroke="#5b4a00" strokeWidth="0.8" opacity="0.55" />
-              <line x1="0.5" y1="20" x2="14" y2="20" stroke="#5b4a00" strokeWidth="0.8" opacity="0.55" />
-              <line x1="26" y1="10" x2="39.5" y2="10" stroke="#5b4a00" strokeWidth="0.8" opacity="0.55" />
-              <line x1="26" y1="20" x2="39.5" y2="20" stroke="#5b4a00" strokeWidth="0.8" opacity="0.55" />
+              <rect x="6" y="6" width="28" height="18" rx="3" fill="none" stroke="#5b4a12" strokeWidth="0.8" opacity="0.55" />
+              <line x1="0.5" y1="10" x2="14" y2="10" stroke="#5b4a12" strokeWidth="0.8" opacity="0.55" />
+              <line x1="0.5" y1="20" x2="14" y2="20" stroke="#5b4a12" strokeWidth="0.8" opacity="0.55" />
+              <line x1="26" y1="10" x2="39.5" y2="10" stroke="#5b4a12" strokeWidth="0.8" opacity="0.55" />
+              <line x1="26" y1="20" x2="39.5" y2="20" stroke="#5b4a12" strokeWidth="0.8" opacity="0.55" />
             </svg>
-            <Box component="span" sx={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.55)' }}>
-              {brandText}
-            </Box>
+            <Box className="pw-card-brand pw-display">{brandText}</Box>
           </Box>
 
-          <Box
-            sx={{
-              fontFamily: "'Courier New', ui-monospace, SFMono-Regular, monospace",
-              fontSize: { xs: 15, sm: 18 },
-              letterSpacing: '0.09em',
-              fontWeight: 700,
-              color: '#f3f1e8',
-              textShadow: '0 1px 0 rgba(255,255,255,0.12), 0 2px 3px rgba(0,0,0,0.55)',
-              zIndex: 1,
-            }}
-          >
-            {numberDisplay}
-          </Box>
+          <Box className="pw-card-number pw-mono">{numberDisplay}</Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 1, zIndex: 1 }}>
+          <Box className="pw-card-row" sx={{ alignItems: 'flex-end' }}>
             <Box sx={{ minWidth: 0 }}>
-              <Box component="p" sx={{ m: 0, fontSize: 7.5, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>TITULAR</Box>
-              <Box component="p" sx={{ m: 0, fontSize: 12, fontWeight: 600, letterSpacing: '0.03em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {nameDisplay}
-              </Box>
+              <p className="pw-card-label">TITULAR</p>
+              <p className="pw-card-value">{nameDisplay}</p>
             </Box>
             <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-              <Box component="p" sx={{ m: 0, fontSize: 7.5, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>VALIDADE</Box>
-              <Box component="p" sx={{ m: 0, fontSize: 12, fontWeight: 600 }}>{expiryDisplay}</Box>
+              <p className="pw-card-label">VALIDADE</p>
+              <p className="pw-card-value">{expiryDisplay}</p>
             </Box>
-            <svg width="32" height="21" viewBox="0 0 36 24" style={{ flexShrink: 0 }}>
+            <svg width="34" height="22" viewBox="0 0 36 24" style={{ flexShrink: 0 }}>
               <circle cx="13" cy="12" r="12" fill="#eb5222" />
               <circle cx="23" cy="12" r="12" fill="#f6a70e" />
               <path d="M18 3.4a12 12 0 010 17.2 12 12 0 010-17.2z" fill="#f07a1e" />
@@ -128,28 +72,14 @@ export default function CardPreview({ cardNumber, cardholderName, expiry, cvv, b
           </Box>
         </Box>
 
-        {/* verso */}
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: 3,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: 'linear-gradient(160deg,#3a3f4c 0%,#262a34 45%,#14161c 100%)',
-            boxShadow: '0 14px 32px rgba(20,20,30,0.32)',
-            color: '#fff',
-          }}
-        >
-          <Box sx={{ width: '100%', height: 28, bgcolor: '#101116', mt: 2 }} />
-          <Box sx={{ p: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box className="pw-card-face pw-card-face--back">
+          <Box className="pw-card-stripe" />
+          <Box sx={{ p: 1.75, display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
-              <Box sx={{ flex: 1, height: 24, borderRadius: 0.5, background: 'repeating-linear-gradient(45deg,#eceef2,#eceef2 4px,#dfe1e7 4px,#dfe1e7 8px)' }} />
-              <Box sx={{ bgcolor: '#fff', color: '#181a20', fontFamily: 'ui-monospace, monospace', fontSize: 12, fontWeight: 700, px: 1, py: 0.5, borderRadius: 0.5, minWidth: 32, textAlign: 'center' }}>
-                {cvvDisplay}
-              </Box>
+              <Box className="pw-card-cvv-strip" />
+              <Box className="pw-card-cvv-box pw-mono">{cvvDisplay}</Box>
             </Box>
-            <Box component="p" sx={{ m: 0, fontSize: 8.5, color: 'rgba(255,255,255,0.4)', textAlign: 'right' }}>Código de segurança</Box>
+            <p style={{ margin: '4px 0 0', fontSize: 8.5, color: 'rgba(244,242,232,0.4)', textAlign: 'right' }}>Código de segurança</p>
           </Box>
         </Box>
       </Box>

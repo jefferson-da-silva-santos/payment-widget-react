@@ -12,6 +12,7 @@ import { createApiClient } from './utils/api.js';
 import { useDraft } from './hooks/useDraft.js';
 import { useCurrencyInput } from './hooks/useCurrencyInput.js';
 import AmountHeader from './components/AmountHeader.jsx';
+import './styles/payment-widget.css';
 
 const ALL_METHODS = ['PIX', 'CREDIT_CARD', 'DEBIT_CARD', 'BOLETO', 'ACCOUNT_MONEY'];
 
@@ -143,6 +144,7 @@ export default function PaymentWidget({
   return (
     <ThemeProvider theme={muiTheme}>
       <Paper
+        className="pw-root"
         elevation={8}
         sx={{
           width: '100%',
@@ -152,6 +154,7 @@ export default function PaymentWidget({
           border: '1px solid',
           borderColor: 'divider',
           bgcolor: 'background.default',
+          '--pw-accent': muiTheme.palette.primary.main,
         }}
       >
         <AmountHeader

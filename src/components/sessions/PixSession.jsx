@@ -24,7 +24,7 @@ export default function PixSession({ payer, onPayerChange, submitting, error, pa
       }}
     >
       <Stack spacing={0.25}>
-        <Typography variant="subtitle1" fontWeight={650}>Pagar com Pix</Typography>
+        <Typography variant="subtitle1" fontWeight={700} className="pw-display">Pagar com Pix</Typography>
         <Typography variant="caption" color="text.secondary">Aprovação em segundos após o pagamento.</Typography>
       </Stack>
 
