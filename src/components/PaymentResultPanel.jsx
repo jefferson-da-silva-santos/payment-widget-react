@@ -63,7 +63,7 @@ export default function PaymentResultPanel({ payment, apiClient, onApproved, onR
   if (!current) return null;
 
   return (
-    <Stack spacing={2} sx={{ p: 2.5 }}>
+    <Stack spacing={2} className="pw-session">
       <Chip
         size="small"
         color={statusColor(current.status)}

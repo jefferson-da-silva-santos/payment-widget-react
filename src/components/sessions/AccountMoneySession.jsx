@@ -17,7 +17,7 @@ export default function AccountMoneySession({ payer, onPayerChange, submitting, 
     <Stack
       component="form"
       spacing={2.5}
-      sx={{ p: 2.5 }}
+      className="pw-session"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit({});

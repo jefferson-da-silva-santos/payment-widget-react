@@ -103,7 +103,7 @@ export default function CardSession({
   }
 
   return (
-    <Stack component="form" spacing={2.5} sx={{ p: 2.5 }} onSubmit={handleSubmit}>
+    <Stack component="form" spacing={2.5} className="pw-session" onSubmit={handleSubmit}>
       <Stack spacing={0.25}>
         <Typography variant="subtitle1" fontWeight={700} className="pw-display">Pagar com cartão</Typography>
         {isActive && !isReady && (

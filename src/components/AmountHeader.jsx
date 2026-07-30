@@ -16,34 +16,21 @@ export default function AmountHeader({
   inputProps,
 }) {
   return (
-    <Box sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
-      <Typography variant="caption" color="text.secondary">
+    <Box className="pw-amount-header">
+      <Typography variant="caption" color="text.secondary" className="pw-amount-label">
         Valor a pagar
       </Typography>
 
       {editable ? (
-        <InputBase
-          {...inputProps}
-          value={display}
-          sx={{
-            display: "block",
-            fontSize: 28,
-            fontWeight: 700,
-            fontFamily: "ui-monospace, SFMono-Regular, monospace",
-          }}
-        />
+        <InputBase {...inputProps} value={display} className="pw-amount-value pw-mono" fullWidth />
       ) : (
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          sx={{ fontFamily: "ui-monospace, SFMono-Regular, monospace" }}
-        >
+        <Typography component="p" className="pw-amount-value pw-mono">
           {display}
         </Typography>
       )}
 
       {description && (
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography variant="body2" color="text.secondary" className="pw-amount-desc">
           {description}
         </Typography>
       )}

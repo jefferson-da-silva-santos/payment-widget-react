@@ -148,8 +148,8 @@ export default function PaymentWidget({
         elevation={8}
         sx={{
           width: '100%',
-          maxWidth: 420,
-          borderRadius: 4,
+          maxWidth: { xs: 420, sm: 460 },
+          borderRadius: { xs: 4, sm: 5 },
           overflow: 'hidden',
           border: '1px solid',
           borderColor: 'divider',
