@@ -7,9 +7,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PayerFields from '../PayerFields.jsx';
 import AddressFields from '../AddressFields.jsx';
 import PaymentResultPanel from '../PaymentResultPanel.jsx';
-import SessionTabs from '../SessionTabs.jsx';
-import BoletoAnimation from '../animations/BoletoAnimation.jsx';
 import { useRecentAddresses } from '../../hooks/useRecentAddresses.js';
+import { onlyDigits } from '../../masks/document.js';
 
 export default function BoletoSession({
   payer,
@@ -37,28 +36,20 @@ export default function BoletoSession({
     <Stack
       component="form"
       spacing={2.5}
-      className="pw-session"
+      sx={{ p: 2.5 }}
       onSubmit={(e) => {
         e.preventDefault();
         saveAddress(address);
-        onSubmit({ payerAddress: address });
+        onSubmit({ payerAddress: { ...address, zipCode: onlyDigits(address.zipCode) } });
       }}
     >
       <Stack spacing={0.25}>
-        <Typography variant="subtitle1" fontWeight={700} className="pw-display">Pagar com boleto</Typography>
+        <Typography variant="subtitle1" fontWeight={650}>Pagar com boleto</Typography>
         <Typography variant="caption" color="text.secondary">Compensação em até 2 dias úteis após o pagamento.</Typography>
       </Stack>
 
-      <SessionTabs
-        paymentLabel="Boleto"
-        paymentPane={<BoletoAnimation active={submitting} />}
-        dataPane={
-          <>
-            <PayerFields payer={payer} onChange={onPayerChange} />
-            <AddressFields address={address} onChange={onAddressChange} recentAddresses={recentAddresses} />
-          </>
-        }
-      />
+      <PayerFields payer={payer} onChange={onPayerChange} />
+      <AddressFields address={address} onChange={onAddressChange} recentAddresses={recentAddresses} />
 
       {error && <Alert severity="error">{error}</Alert>}
 
