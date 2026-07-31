@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Payment Widget — Preview</title>
+<title>Payment Widget — Preview das mudanças</title>
 <script type="importmap">
 {
   "imports": {
@@ -19,12 +19,15 @@
 </script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  html, body { margin: 0; background: #05060a; min-height: 100vh; }
-  #root { display: flex; justify-content: center; align-items: flex-start; padding: 48px 20px; gap: 40px; flex-wrap: wrap; }
-  .pw-demo-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .pw-demo-label { color: #8890a4; font: 600 12px/1 -apple-system, sans-serif; text-transform: uppercase; letter-spacing: .08em; }
-  .pw-demo-frame--mobile { width: 390px; }
-  .pw-demo-frame--desktop { width: 480px; }
+  html, body { margin: 0; background: #0b0c12; min-height: 100vh; font-family: -apple-system, "Segoe UI", sans-serif; }
+  h2 { color: #e7e9f2; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin: 0 0 18px; }
+  section { padding: 36px 24px; border-bottom: 1px solid #1c1f2b; }
+  .row { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .tag { color: #7d859c; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .frame { width: 420px; }
+  .frame--light { background: #f4f5f9; border-radius: 20px; padding: 20px; }
+  .frame--dark { background: #05060a; border-radius: 20px; padding: 20px; }
   #boot-error { color: #f2545b; font-family: monospace; white-space: pre-wrap; padding: 24px; }
 </style>
 </head>
@@ -51,13 +54,11 @@ function resolve(fromKey, spec) {
 
 async function loadModule(key) {
   if (cache.has(key)) return cache.get(key);
-  log('loading ' + key);
   const promise = (async () => {
     const res = await fetch('./' + key);
     if (!res.ok) throw new Error('fetch failed (' + res.status + '): ' + key);
     let code = await res.text();
 
-    // CSS: injecta <link> real e remove a linha de import
     code = code.replace(/^\s*import\s+['"]([^'"]+\.css)['"];?\s*$/gm, (line, cssSpec) => {
       const cssKey = resolve(key, cssSpec);
       if (!cssInjected.has(cssKey)) {
@@ -70,7 +71,6 @@ async function loadModule(key) {
       return '';
     });
 
-    // Resolve imports/exports relativos (./ ou ../) para blob URLs
     const specifiers = new Set();
     const re = /from\s+['"](\.[^'"]+)['"]/g;
     let m;
@@ -93,47 +93,167 @@ async function loadModule(key) {
   return promise;
 }
 
+function fakeQrBase64() {
+  const c = document.createElement('canvas');
+  c.width = 200; c.height = 200;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 200, 200);
+  ctx.fillStyle = '#14161c';
+  const cell = 10;
+  for (let y = 0; y < 20; y++) {
+    for (let x = 0; x < 20; x++) {
+      if ((x * 7 + y * 13 + x * y) % 5 === 0) ctx.fillRect(x * cell, y * cell, cell, cell);
+    }
+  }
+  ctx.fillRect(0, 0, 40, 40); ctx.fillStyle = '#fff'; ctx.fillRect(8, 8, 24, 24); ctx.fillStyle = '#14161c'; ctx.fillRect(14, 14, 12, 12);
+  return c.toDataURL('image/png').split(',')[1];
+}
+
 try {
-  log('boot start');
   const React = await import('react');
-  log('react ok');
   const { createRoot } = await import('react-dom/client');
-  log('react-dom ok');
-  const entryUrl = await loadModule('src/index.js');
-  log('entry module built, importing…');
-  const { PaymentWidget } = await import(entryUrl);
-  log('PaymentWidget imported ok');
+  const { ThemeProvider } = await import('@mui/material/styles');
+  const Paper = (await import('@mui/material/Paper')).default;
 
-  const root = document.getElementById('root');
-  root.innerHTML = '';
+  const themeUrl = await loadModule('src/theme.js');
+  const { createWidgetTheme } = await import(themeUrl);
 
-  function Demo({ label, frameClass }) {
+  const paymentWidgetUrl = await loadModule('src/PaymentWidget.jsx');
+  const { default: PaymentWidget } = await import(paymentWidgetUrl);
+
+  const resultPanelUrl = await loadModule('src/components/PaymentResultPanel.jsx');
+  const { default: PaymentResultPanel } = await import(resultPanelUrl);
+
+  const walletUrl = await loadModule('src/components/animations/WalletAnimation.jsx');
+  const { default: WalletAnimation } = await import(walletUrl);
+
+  const qrBase64 = fakeQrBase64();
+
+  const fakeApiClient = { getReceiptUrl: () => '#' };
+
+  function ShellCard({ mode, children }) {
+    const muiTheme = createWidgetTheme(mode, '#6d5ef8');
     return React.createElement(
-      'div',
-      { className: 'pw-demo-col' },
-      React.createElement('span', { className: 'pw-demo-label' }, label),
+      ThemeProvider,
+      { theme: muiTheme },
       React.createElement(
-        'div',
-        { className: frameClass },
-        React.createElement(PaymentWidget, {
-          apiBaseUrl: 'http://localhost:4000/api',
-          publicKey: 'TEST-fake-public-key',
-          amount: 150,
-          description: 'Pedido de teste #4821',
-          methods: ['PIX', 'CREDIT_CARD', 'BOLETO', 'ACCOUNT_MONEY'],
-        })
-      )
+        Paper,
+        {
+          className: 'pw-root',
+          'data-pw-theme': mode,
+          elevation: 8,
+          sx: {
+            width: '100%',
+            borderRadius: 5,
+            overflow: 'hidden',
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.default',
+            '--pw-accent': muiTheme.palette.primary.main,
+          },
+        },
+        children,
+      ),
     );
   }
 
-  createRoot(root).render(
-    React.createElement(
+  function Col({ tag, mode, children }) {
+    return React.createElement(
+      'div',
+      { className: 'col' },
+      React.createElement('span', { className: 'tag' }, tag),
+      React.createElement('div', { className: `frame frame--${mode}` },
+        React.createElement('div', { className: 'frame' }, children),
+      ),
+    );
+  }
+
+  // Widget completo (com header, tabs e inputs reais) — light e dark
+  function FullWidgetDemo() {
+    return React.createElement('div', { className: 'row' },
+      React.createElement(Col, { tag: 'Tema claro', mode: 'light' },
+        React.createElement(PaymentWidget, {
+          apiBaseUrl: 'http://localhost:4000/api',
+          publicKey: 'TEST-fake-public-key',
+          amount: 1897.5,
+          description: 'Pedido #4821 — Assinatura anual',
+          methods: ['PIX', 'CREDIT_CARD', 'BOLETO', 'ACCOUNT_MONEY'],
+          theme: 'light',
+        }),
+      ),
+      React.createElement(Col, { tag: 'Tema escuro', mode: 'dark' },
+        React.createElement(PaymentWidget, {
+          apiBaseUrl: 'http://localhost:4000/api',
+          publicKey: 'TEST-fake-public-key',
+          amount: 1897.5,
+          description: 'Pedido #4821 — Assinatura anual',
+          methods: ['PIX', 'CREDIT_CARD', 'BOLETO', 'ACCOUNT_MONEY'],
+          theme: 'dark',
+        }),
+      ),
+    );
+  }
+
+  function ResultDemo({ payment, tag }) {
+    return React.createElement('div', { className: 'row' },
+      React.createElement(Col, { tag: `${tag} — claro`, mode: 'light' },
+        React.createElement(ShellCard, { mode: 'light' },
+          React.createElement(PaymentResultPanel, { payment, apiClient: fakeApiClient }),
+        ),
+      ),
+      React.createElement(Col, { tag: `${tag} — escuro`, mode: 'dark' },
+        React.createElement(ShellCard, { mode: 'dark' },
+          React.createElement(PaymentResultPanel, { payment, apiClient: fakeApiClient }),
+        ),
+      ),
+    );
+  }
+
+  function WalletDemo() {
+    return React.createElement('div', { className: 'row' },
+      React.createElement(Col, { tag: 'Claro', mode: 'light' },
+        React.createElement(ShellCard, { mode: 'light' },
+          React.createElement('div', { style: { padding: 24 } }, React.createElement(WalletAnimation, { active: false })),
+        ),
+      ),
+      React.createElement(Col, { tag: 'Escuro', mode: 'dark' },
+        React.createElement(ShellCard, { mode: 'dark' },
+          React.createElement('div', { style: { padding: 24 } }, React.createElement(WalletAnimation, { active: false })),
+        ),
+      ),
+    );
+  }
+
+  function Root() {
+    return React.createElement(
       React.Fragment,
       null,
-      React.createElement(Demo, { label: 'Mobile (390px)', frameClass: 'pw-demo-frame--mobile' }),
-      React.createElement(Demo, { label: 'Desktop (480px)', frameClass: 'pw-demo-frame--desktop' })
-    )
-  );
+      React.createElement('section', null,
+        React.createElement('h2', null, '1 · Header do valor a pagar — claro e escuro (clique num campo para ver o foco sem borda cinza)'),
+        React.createElement(FullWidgetDemo),
+      ),
+      React.createElement('section', null,
+        React.createElement('h2', null, '2 · QR code + status do pagamento (Pix pendente)'),
+        React.createElement(ResultDemo, { payment: pendingPaymentGlobal(), tag: 'Pix pendente' }),
+      ),
+      React.createElement('section', null,
+        React.createElement('h2', null, '3 · Status aprovado / recusado'),
+        React.createElement(ResultDemo, { payment: approvedPaymentGlobal(), tag: 'Aprovado' }),
+        React.createElement('div', { style: { height: 24 } }),
+        React.createElement(ResultDemo, { payment: rejectedPaymentGlobal(), tag: 'Recusado' }),
+      ),
+      React.createElement('section', null,
+        React.createElement('h2', null, '4 · Animação de saldo Mercado Pago — agora com tema claro de verdade'),
+        React.createElement(WalletDemo),
+      ),
+    );
+  }
+
+  function pendingPaymentGlobal() { return { id: '1', status: 'PENDING', pix: { qrCodeBase64: qrBase64, qrCode: '00020126...fake' } }; }
+  function approvedPaymentGlobal() { return { id: '2', status: 'APPROVED' }; }
+  function rejectedPaymentGlobal() { return { id: '3', status: 'REJECTED' }; }
+
+  createRoot(document.getElementById('root')).render(React.createElement(Root));
 } catch (err) {
   log('ERRO: ' + (err && (err.stack || err.message) || err));
   console.error(err);

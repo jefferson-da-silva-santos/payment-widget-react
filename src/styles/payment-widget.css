@@ -21,12 +21,31 @@
 .pw-root .pw-mono { font-family: var(--pw-mono); }
 
 /* ==================== Cabeçalho de valor ==================== */
-.pw-amount-header { padding: var(--pw-space) var(--pw-space) 14px; }
+.pw-amount-header {
+  position: relative;
+  padding: var(--pw-space) var(--pw-space) 22px;
+  background: radial-gradient(120% 160% at 12% -20%, color-mix(in srgb, var(--pw-accent, #6d5ef8) 14%, transparent), transparent 65%);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 9%, transparent);
+}
+.pw-amount-eyebrow { margin-bottom: 12px; }
+.pw-amount-eyebrow-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--pw-accent, #6d5ef8);
+  background: color-mix(in srgb, var(--pw-accent, #6d5ef8) 16%, transparent);
+}
 .pw-amount-label { display: block; text-transform: uppercase; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; opacity: 0.75; }
-.pw-amount-value { display: block; margin: 6px 0 0; font-size: 48px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; border: none; padding: 0; width: 100%; color: var(--pw-accent, #6d5ef8); background: linear-gradient(120deg, color-mix(in srgb, var(--pw-accent, #6d5ef8) 55%, white 45%), var(--pw-accent, #6d5ef8) 60%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 14px color-mix(in srgb, var(--pw-accent, #6d5ef8) 40%, transparent)); }
-.pw-amount-desc { display: block; margin-top: 8px; }
+.pw-amount-value { display: flex; align-items: baseline; gap: 7px; margin: 0; font-size: 42px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; border: none; padding: 0; width: 100%; }
+.pw-amount-currency { font-size: 0.4em; font-weight: 700; letter-spacing: -0.01em; color: var(--pw-accent, #6d5ef8); align-self: flex-start; margin-top: 0.4em; }
+.pw-amount-figure { font-variant-numeric: tabular-nums; }
+.pw-amount-desc { display: block; margin-top: 10px; opacity: 0.85; }
 @media (min-width: 640px) {
-  .pw-amount-value { font-size: 56px; }
+  .pw-amount-value { font-size: 50px; }
 }
 
 /* ==================== Cartão ==================== */
@@ -210,6 +229,15 @@
   background: linear-gradient(75deg, transparent 35%, rgba(255, 255, 255, 0.1) 50%, transparent 65%);
   animation: pw-sheen 5s ease-in-out infinite;
 }
+.pw-root[data-pw-theme="light"] .pw-wallet-card {
+  color: #4c5470;
+  background: linear-gradient(155deg, #ffffff, #eceef5);
+  box-shadow: 0 16px 30px -16px rgba(20, 22, 40, 0.22), inset 0 0 0 1px rgba(20, 22, 40, 0.07);
+}
+.pw-root[data-pw-theme="light"] .pw-wallet-card::after {
+  background: linear-gradient(75deg, transparent 35%, rgba(255, 255, 255, 0.65) 50%, transparent 65%);
+}
+.pw-root[data-pw-theme="light"] .pw-wallet-track { background: rgba(20, 22, 40, 0.08); }
 .pw-wallet-icon { color: var(--pw-accent, #6d5ef8); flex-shrink: 0; }
 .pw-wallet-track { position: relative; flex: 1; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
 .pw-wallet-fill {
@@ -260,6 +288,13 @@
 .pw-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: transparent;
 }
+.pw-root .MuiOutlinedInput-input:focus,
+.pw-root .MuiInputBase-input:focus,
+.pw-root input:focus,
+.pw-root select:focus,
+.pw-root textarea:focus {
+  outline: none;
+}
 .pw-root .MuiButton-containedPrimary { box-shadow: 0 10px 22px -6px color-mix(in srgb, var(--pw-accent, #6d5ef8) 55%, transparent); }
 .pw-root .MuiButton-containedPrimary:active { transform: scale(0.98); }
 .pw-root .MuiButton-root { min-height: 46px; }
@@ -280,6 +315,51 @@
   transition: opacity 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 .pw-segmented button.is-active { opacity: 1; background: color-mix(in srgb, currentColor 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 10%, transparent); }
+
+/* ==================== Painel de resultado: status + QR ==================== */
+.pw-status {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 8%, transparent);
+}
+.pw-status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+.pw-status-label { font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; }
+.pw-status--success .pw-status-icon { color: #fff; background: #1fa972; }
+.pw-status--success .pw-status-label { color: #1fa972; }
+.pw-status--error .pw-status-icon { color: #fff; background: #e2434c; }
+.pw-status--error .pw-status-label { color: #e2434c; }
+.pw-status--warning .pw-status-icon { color: #fff; background: #d98c1f; }
+.pw-status--warning .pw-status-label { color: #d98c1f; }
+
+.pw-qr-card {
+  position: relative;
+  padding: 22px 20px 18px;
+  border-radius: 18px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 8%, transparent);
+}
+.pw-qr-image {
+  width: 232px;
+  height: 232px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  cursor: zoom-in;
+  box-shadow: 0 14px 28px -14px rgba(10, 11, 20, 0.35);
+}
+@media (min-width: 640px) {
+  .pw-qr-image { width: 256px; height: 256px; }
+}
 
 /* ==================== Sessões: espaçamento responsivo ==================== */
 .pw-session { padding: 18px var(--pw-space) var(--pw-space); }

@@ -145,6 +145,7 @@ export default function PaymentWidget({
     <ThemeProvider theme={muiTheme}>
       <Paper
         className="pw-root"
+        data-pw-theme={theme === 'light' ? 'light' : 'dark'}
         elevation={8}
         sx={{
           width: '100%',

@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -18,6 +17,16 @@ const STATUS_LABEL = {
   CHARGED_BACK: 'Chargeback',
 };
 
+const STATUS_DESCRIPTION = {
+  PENDING: 'Assim que o pagamento cair, atualizamos aqui automaticamente.',
+  IN_PROCESS: 'Estamos confirmando o pagamento com o emissor.',
+  APPROVED: 'Pagamento confirmado com sucesso.',
+  REJECTED: 'O pagamento não foi autorizado.',
+  CANCELLED: 'Este pagamento foi cancelado.',
+  REFUNDED: 'O valor foi devolvido ao pagador.',
+  CHARGED_BACK: 'O pagamento sofreu contestação (chargeback).',
+};
+
 const POLLABLE = ['PENDING', 'IN_PROCESS'];
 const POLL_INTERVAL_MS = 3000;
 
@@ -25,6 +34,29 @@ function statusColor(status) {
   if (status === 'APPROVED') return 'success';
   if (['REJECTED', 'CANCELLED', 'CHARGED_BACK'].includes(status)) return 'error';
   return 'warning';
+}
+
+function CheckIcon(props) {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" {...props}>
+      <path d="M2.5 7.2 5.6 10.3 11.5 3.8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CrossIcon(props) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" {...props}>
+      <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function StatusIcon({ status }) {
+  if (POLLABLE.includes(status)) return <CircularProgress size={12} color="inherit" thickness={5} />;
+  if (status === 'APPROVED') return <CheckIcon />;
+  if (['REJECTED', 'CANCELLED', 'CHARGED_BACK'].includes(status)) return <CrossIcon />;
+  return <CheckIcon />;
 }
 
 export default function PaymentResultPanel({ payment, apiClient, onApproved, onRejected, onCancelled, onStatusChange }) {
@@ -62,18 +94,24 @@ export default function PaymentResultPanel({ payment, apiClient, onApproved, onR
 
   if (!current) return null;
 
+  const color = statusColor(current.status);
+
   return (
-    <Stack spacing={2} className="pw-session">
-      <Chip
-        size="small"
-        color={statusColor(current.status)}
-        icon={POLLABLE.includes(current.status) ? <CircularProgress size={10} color="inherit" /> : undefined}
-        label={STATUS_LABEL[current.status] ?? current.status}
-        sx={{ alignSelf: 'flex-start', fontWeight: 700, textTransform: 'uppercase', fontSize: 11 }}
-      />
+    <Stack spacing={2.5} className="pw-session">
+      <Stack direction="row" spacing={1.5} alignItems="center" className={`pw-status pw-status--${color}`}>
+        <Box className="pw-status-icon">
+          <StatusIcon status={current.status} />
+        </Box>
+        <Stack spacing={0.15}>
+          <Typography className="pw-status-label">{STATUS_LABEL[current.status] ?? current.status}</Typography>
+          <Typography variant="caption" color="text.secondary">
+            {STATUS_DESCRIPTION[current.status] ?? ''}
+          </Typography>
+        </Stack>
+      </Stack>
 
       {current.pix?.qrCodeBase64 && (
-        <Stack alignItems="center" spacing={1} sx={{ bgcolor: 'background.paper', borderRadius: 2, p: 2 }}>
+        <Stack alignItems="center" spacing={1.5} className="pw-qr-card">
           <QrCodeModal
             qrCodeBase64={current.pix.qrCodeBase64}
             trigger={
@@ -81,7 +119,7 @@ export default function PaymentResultPanel({ payment, apiClient, onApproved, onR
                 component="img"
                 src={`data:image/png;base64,${current.pix.qrCodeBase64}`}
                 alt="QR Code Pix - clique para ampliar"
-                sx={{ width: 176, height: 176, bgcolor: '#fff', borderRadius: 1.5, p: 1, cursor: 'zoom-in' }}
+                className="pw-qr-image"
               />
             }
           />
